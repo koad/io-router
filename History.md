@@ -1,3 +1,12 @@
+v2.0.0 / 2025-7-16
+==================
+  * Renamed package from iron:router to koad:io-router
+  * Combined multiple repositories into a single cohesive package:
+    - From polygonwood: iron-router, iron-controller, iron-layout, iron-dynamic-template, iron-middleware-stack
+    - From iron-meteor: iron-core, iron-location, iron-url
+  * Built for integration with koad:io-core
+  * Updated documentation to reflect package changes
+
 v1.1.2 / 2017-2-12
 ==================
   * Bump Iron:Url version
@@ -116,7 +125,7 @@ v0.8.0 / 2014-07-29
   * fix: ie9 omits leading slash in pathname on click handler
   * Added test to prove I was wrong in #689
   * Added test case and fixed #676
-  * Don’t call unnecessary stop() in client router when browsing away.
+  * Don't call unnecessary stop() in client router when browsing away.
   * Update route_controller.js
   * Add semicolon
   * Update DOCS.md

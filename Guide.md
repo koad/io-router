@@ -1,21 +1,35 @@
-# Iron.Router
+# koad:io-router
 
-A router that works on the server and the browser, designed specifically for
-[Meteor](https://github.com/meteor/meteor).
+A comprehensive router package that works on the server and the browser, designed specifically for [Meteor](https://github.com/meteor/meteor) and integrated with koad:io-core.
 
+## Overview
+
+koad:io-router unifies the following repositories into a single cohesive package:
+
+### From polygonwood
+- [iron-router](https://github.com/polygonwood/iron-router) - Core routing functionality
+- [iron-controller](https://github.com/polygonwood/iron-controller) - Controller layer
+- [iron-layout](https://github.com/polygonwood/iron-layout) - Layout management
+- [iron-dynamic-template](https://github.com/polygonwood/iron-dynamic-template) - Dynamic template handling
+- [iron-middleware-stack](https://github.com/polygonwood/iron-middleware-stack) - Middleware implementation
+
+### From iron-meteor
+- [iron-core](https://github.com/iron-meteor/iron-core) - Core functionality
+- [iron-location](https://github.com/iron-meteor/iron-location) - Location handling
+- [iron-url](https://github.com/iron-meteor/iron-url) - URL parsing and manipulation
 
 ## Quick Start
-You can install iron:router using Meteor's package management system:
+You can install koad:io-router using Meteor's package management system:
 
 ```bash
-> meteor add iron:router
+> meteor add koad:io-router
 ```
 
-To update iron:router to the latest version you can use the `meteor update`
+To update koad:io-router to the latest version you can use the `meteor update`
 command:
 
 ```bash
-> meteor update iron:router
+> meteor update koad:io-router
 ```
 
 Start by creating a route in your JavaScript file. By default, routes are
@@ -120,7 +134,7 @@ an application without making trips to the server by taking advantage of browser
 HTML5 features like pushState or url hash fragments.
 
 ### Client and Server
-Iron.Router runs on the client *and* the server. You can define a route that
+koad:io-router runs on the client *and* the server. You can define a route that
 only should run on the server, or a route that should only run on the client.
 Most of the time you'll create routes on the client. This makes your app really
 fast once it's loaded, because as you navigate around the application, you don't
@@ -1293,7 +1307,7 @@ global helper method.
 Legacy browsers do not support the HTML5 `pushState` and `history` features
 required for normal client side browsing with the `Router`. To solve this
 problem, the `Router` can fall back to using hash fragments in the url.
-Actually, under the hood, `iron-router` uses a package called `iron-location`
+Actually, under the hood, `koad:io-router` uses a package called `iron-location`
 which handles all of this. It works similarly to the `History.js` project but
 works seamlessly.
 

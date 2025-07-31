@@ -1,24 +1,32 @@
-Iron.Router
-==============================================================================
+# koad:io-router
 
-[![Join the chat at https://gitter.im/iron-meteor/iron-router](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/iron-meteor/iron-router?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+A comprehensive router package for [Meteor](https://github.com/meteor/meteor), built specifically for the koad:io framework. This package combines multiple Iron Router repositories into a single, streamlined package.
 
-A router that works on the server and the browser, designed specifically for <a href="https://github.com/meteor/meteor" target="_blank">Meteor</a>
+## Overview
 
-## The Iron.Router Guide
-Detailed explanations of router features can be found in the [Guide](http://iron-meteor.github.io/iron-router/).
+koad:io-router unifies the following repositories into a single cohesive package:
+
+### From polygonwood
+- [iron-router](https://github.com/polygonwood/iron-router) - Core routing functionality
+- [iron-controller](https://github.com/polygonwood/iron-controller) - Controller layer
+- [iron-layout](https://github.com/polygonwood/iron-layout) - Layout management
+- [iron-dynamic-template](https://github.com/polygonwood/iron-dynamic-template) - Dynamic template handling
+- [iron-middleware-stack](https://github.com/polygonwood/iron-middleware-stack) - Middleware implementation
+
+### From iron-meteor
+- [iron-core](https://github.com/iron-meteor/iron-core) - Core functionality
+- [iron-location](https://github.com/iron-meteor/iron-location) - Location handling
+- [iron-url](https://github.com/iron-meteor/iron-url) - URL parsing and manipulation
 
 ## Installation
 
 ```shell
-meteor add iron:router
+meteor add koad:io-router
 ```
 
-## Examples
-There are several examples in the [examples folder](examples).
-
 ## Quick Start
-Create some routes in a client/server JavaScript file:
+
+Create routes in a client/server JavaScript file:
 
 ```javascript
 Router.route('/', function () {
@@ -34,42 +42,38 @@ Router.route('/items/:_id', function () {
   this.render('ShowItem', {data: item});
 });
 
+// Server-side route
 Router.route('/files/:filename', function () {
   this.response.end('hi from the server\n');
 }, {where: 'server'});
 
-Router.route('/restful', {where: 'server'})
+// RESTful API routes
+Router.route('/api', {where: 'server'})
   .get(function () {
     this.response.end('get request\n');
   })
   .post(function () {
     this.response.end('post request\n');
   });
-
 ```
 
-## Migrating from 0.9.4
+## Key Features
 
-Iron Router should be reasonably backwards compatible, but there are a few required changes that you need to know about:
+- **Client and Server Routing**: Works seamlessly on both client and server
+- **RESTful Routes**: Support for RESTful API endpoints
+- **Template Integration**: Automatic template rendering based on route configuration
+- **Middleware Support**: Hook into the routing lifecycle with middleware
+- **Layout Management**: Control layouts and nested templates
+- **Dynamic Templates**: Render templates dynamically based on route data
+- **Parameter Extraction**: Easy access to URL parameters and query strings
 
-### Hooks
+## Hook System
 
-`onRun` and `onBeforeAction` hooks now require you to call `this.next()`, and no longer take a `pause()` argument. So the default behaviour is reversed. For example, if you had:
-
-```javascript
-Router.onBeforeAction(function(pause) {
-  if (! Meteor.userId()) {
-    this.render('login');
-    pause();
-  }
-});
-```
-
-You'll need to update it to
+The router provides several hooks for controlling the routing flow:
 
 ```javascript
 Router.onBeforeAction(function() {
-  if (! Meteor.userId()) {
+  if (!Meteor.userId()) {
     this.render('login');
   } else {
     this.next();
@@ -77,89 +81,70 @@ Router.onBeforeAction(function() {
 });
 ```
 
-This is to fit better with existing route middleware (e.g. connect) APIs.
+## Template Lookup
 
-### Controller Methods
-
-`controller.setLayout()` is now `controller.layout()`. Usually called as `this.layout("fooTemplate")` inside a route action.
-
-### Query Parameters
-Query parameters now get their own object on `this.params`. To access the query object you can use `this.params.query`.
-
-### Loading Hook
-
-The `loading` hook now runs automatically on the client side if your route has a `waitOn`. As previously, you can set a global or per-route `loadingTemplate`.
-
-If you want to setup subscriptions but not have an automatic loading hook, you can use the new `subscriptions` option, which still affects `.ready()`-ness, but doesn't force the `loading` hook.
-
-### Hook and option inheritance
-
-All hooks and options are now fully inherited from parent controllers and the router itself as you might expect. The order of precendence is now route; controller; parent controller; router.
-
-### Route names
-
-A route's name is now accessible at `route.getName()` (previously it was `route.name`). In particular, you'll need to write `Router.current().route.getName()`.
-
-### Routes on client and server
-
-It's not strictly required, but moving forward, Iron Router expects all routes to be declared on both client and server. This means that the client can route to the server and visa-versa.
-
-### Catchall routes
-
-Iron Router now uses [path-to-regexp](https://github.com/pillarjs/path-to-regexp), which means the syntax for catchall routes has changed a little -- it's now `'/(.*)'`.
-
-### Template Lookup
-
-If you don't explicitly set a template option on your route, and you don't
-explicity render a template name, the router will try to automatically render a
-template based on the name of the route. By default the router will look for the
-class case name of the template.
-
-For example, if you have a route defined like this:
+If you don't explicitly set a template option on your route and don't explicitly render a template name, the router will try to automatically render a template based on the name of the route:
 
 ```javascript
 Router.route('/items/:_id', {name: 'items.show'});
+// Will look for a template named 'ItemsShow'
 ```
 
-The router will by default look for a template named `ItemsShow` with capital
-letters for each word and punctuation removed. If you would like to customize
-this behavior you can set your own converter function. For example, let's say
-you don't want any conversion. You can set the converter function like this:
+To customize this behavior, set your own converter function:
 
 ```javascript
 Router.setTemplateNameConverter(function (str) { return str; });
 ```
 
+## Waiting On Data
+
+You can use the `waitOn` option to make sure data is available before rendering:
+
+```javascript
+Router.route('/post/:_id', {
+  name: 'post.show',
+  waitOn: function() {
+    return Meteor.subscribe('post', this.params._id);
+  }
+});
+```
+
+## Query Parameters
+
+Access query parameters through the `query` object:
+
+```javascript
+Router.route('/search', function() {
+  var keyword = this.params.query.keyword;
+  this.render('searchResults', {data: {keyword: keyword}});
+});
+```
+
 ## Contributing
-Contributors are very welcome. There are many things you can help with,
-including finding and fixing bugs, creating examples for the examples folder,
-contributing to improved design or adding features. Some guidelines below:
 
-* **Questions**: Please post to Stack Overflow and tag with `iron-router` : http://stackoverflow.com/questions/tagged/iron-router.
+Contributions to koad:io-router are welcome! Whether it's bug fixes, feature enhancements, or documentation improvements, your help is appreciated.
 
-* **New Features**: If you'd like to work on a feature,
-  start by creating a 'Feature Design: Title' issue. This will let people bat it
-  around a bit before you send a full blown pull request. Also, you can create
-  an issue to discuss a design even if you won't be working on it.
+### Reporting Issues
 
-* **Bugs**: If you think you found a bug, please create a "reproduction." This is a small project that demonstrates the problem as concisely as possible. The project should be cloneable from Github. Any bug reports without a reproduction that don't have an obvious solution will be marked as "awaiting-reproduction" and closed after one week. Want more information on creating reproductions? Watch this video: https://www.eventedmind.com/feed/github-issues-and-reproductions.
+When reporting issues, please include:
+- A clear description of the problem
+- Steps to reproduce the issue
+- Expected vs. actual behavior
+- A minimal reproduction case if possible
 
-###  Working Locally
-This is useful if you're contributing code to iron-router.
+### Development Setup
 
-  1. Set up a local packages folder
-  2. Add the PACKAGE_DIRS environment variable to your .bashrc file
-    - Example: `export PACKAGE_DIRS="/Users/cmather/code/packages"`
-    - Screencast: https://www.eventedmind.com/posts/meteor-versioning-and-packages
-  3. Clone the repository into your local packages directory
-  4. Add iron-router just like any other meteor core package like this: `meteor
-     add iron:router`
+1. Clone the repository
+2. Set up a local packages directory
+3. Add the package to your Meteor project for testing
 
 ```bash
-> git clone https://github.com/EventedMind/iron-router.git /Users/cmather/code/packages/iron:router
-> cd my-project
-> meteor add iron:router
+export PACKAGE_DIRS="/path/to/your/packages"
+git clone https://github.com/koad/io-router.git /path/to/your/packages/koad-io-router
+cd your-meteor-project
+meteor add koad:io-router
 ```
 
 ## License
+
 MIT
